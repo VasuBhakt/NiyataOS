@@ -19,7 +19,7 @@ namespace niyata::port {
     namespace {
 
         // makecontext only passes int arguments, so split the pointer into two halves.
-        void split_pointer(unsigned int hi, unsigned int lo) {
+        void trampoline(unsigned int hi, unsigned int lo) {
             auto addr = (static_cast<std::uintptr_t>(hi) << 32) | static_cast<std::uintptr_t>(lo);
             auto* ctx = reinterpret_cast<Context*>(addr);
             ctx->fn(ctx->arg);
@@ -43,7 +43,7 @@ namespace niyata::port {
         ctx->uc.uc_link = &on_exit->uc;
 
         auto addr = reinterpret_cast<std::uintptr_t>(ctx);
-        makecontext(&ctx->uc, reinterpret_cast<void (*)()>(split_pointer), 2, static_cast<unsigned int>(addr >> 32), static_cast<unsigned int>(addr & 0xffffffffu));
+        makecontext(&ctx->uc, reinterpret_cast<void (*)()>(trampoline), 2, static_cast<unsigned int>(addr >> 32), static_cast<unsigned int>(addr & 0xffffffffu));
         return ctx;
     }
 
