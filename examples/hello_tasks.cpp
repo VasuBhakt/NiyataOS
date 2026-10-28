@@ -1,44 +1,35 @@
-// Day 1-2 throwaway: two stacks, manual switching, no scheduler yet.
-// Expected output: A0 B0 A1 B1 A2 B2 done
+// Example tests to get users onboard with API
+// Expected output : A0 B0 A1 B1 A2 B2 done
 
 #include <cstdio>
-#include <vector>
 
-#include "niyata/port.hpp"
+#include "niyata/scheduler.hpp"
 
-using namespace niyata::port;
+using namespace niyata;
 
-static Context* g_main;
-static Context* g_a;
-static Context* g_b;
+struct TaskArg {
+    Scheduler* sched;
+    char name;
+    int iters;
+};
 
-static void task_a(void*) {
-    for (int i = 0; i < 3; ++i) {
-        std::printf("A%d ", i);
-        context_switch(g_a, g_b);
-    }
-}
-
-static void task_b(void*) {
-    for (int i = 0; i < 3; ++i) {
-        std::printf("B%d ", i);
-        context_switch(g_b, g_a);
-    }
+void task_fn(void* p) {
+    auto* arg = static_cast<TaskArg*>(p);
+    for (int i = 0; i < arg->iters; i++) {
+        std::printf("%c%d ", arg->name, i);
+        arg->sched->yield();
+    } 
 }
 
 int main() {
-    constexpr std::size_t kStack = 64 * 1024;
-    std::vector<char> stack_a(kStack), stack_b(kStack);
+    Scheduler s;
+    TaskArg a{&s, 'A', 3};
+    TaskArg b{&s, 'B', 3};
 
-    g_main = context_create_main();
-    g_a = context_create(stack_a.data(), kStack, task_a, nullptr, g_main);
-    g_b = context_create(stack_b.data(), kStack, task_b, nullptr, g_main);
+    s.create_task("A", task_fn, &a);
+    s.create_task("B", task_fn, &b);
 
-    context_switch(g_main, g_a);  // when task_a returns, we land back here
+    s.run();
     std::printf("done\n");
-
-    context_destroy(g_a);
-    context_destroy(g_b);
-    context_destroy(g_main);
     return 0;
 }
