@@ -11,6 +11,7 @@ option(NIYATA_BUILD_EXAMPLES "Build examples" ON)
 
 # Core library. Add src/*.cpp here as the scheduler grows.
 add_library(niyata
+    src/scheduler.cpp
     port/host/context_ucontext.cpp
 )
 target_include_directories(niyata PUBLIC include)
