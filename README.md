@@ -16,10 +16,10 @@ Early development. Track progress in the roadmap below.
 
 | Feature | Status |
 | --- | --- |
-| Portable port layer (platform-independent core) | In progress |
-| Task control blocks and context switching | In progress |
-| Cooperative round-robin scheduling | Planned |
-| Simulated, tick-driven clock and `sleep` | Planned |
+| Portable port layer (platform-independent core) | Done |
+| Task control blocks and context switching | Done |
+| Cooperative round-robin scheduling | Done |
+| Simulated, tick-driven clock and `sleep` | Done |
 | Fixed-priority preemptive scheduling (O(1) task selection) | Planned |
 | Mutex and counting semaphore | Planned |
 | Priority inheritance | Planned |
@@ -87,7 +87,7 @@ A0 B0 A1 B1 A2 B2 done
 
 ## Roadmap
 
-- [ ] Cooperative core: task control block, context switch, round-robin, simulated clock, sleep
+- [x] Cooperative core: task control block, context switch, round-robin, simulated clock, sleep
 - [ ] Preemption and fixed-priority scheduling
 - [ ] Mutex, semaphore, priority inversion demo and priority inheritance fix
 - [ ] Pool allocator, benchmarks, design write-up
@@ -98,6 +98,10 @@ A0 B0 A1 B1 A2 B2 done
 
 Results will be published in [`docs/benchmarks.md`](docs/benchmarks.md) once the host benchmarks are in.
 
+## Maintainer
+
+[Swastik Bose](https://github.com/VasuBhakt), a.k.a VasuBhakt
+
 ## License
 
-MIT
+[MIT](LICENSE)
