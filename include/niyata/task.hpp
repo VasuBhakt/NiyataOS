@@ -3,6 +3,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <vector>
+#include <limits>
 
 #include "niyata/port.hpp"
 
@@ -22,6 +23,9 @@ namespace niyata {
         const char* name = "";
         TaskState state = TaskState::Ready;
         std::uint8_t priority = 0;
+
+        static constexpr std::uint64_t kNoWake = std::numeric_limits<std::uint64_t>::max();
+        std::uint64_t wake_tick = kNoWake; // meaningful only while sleeping
 
         TaskFn entry = nullptr;
         void* arg = nullptr;

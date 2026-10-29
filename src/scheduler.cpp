@@ -80,4 +80,33 @@ namespace niyata {
         // When this task is scheduled again later, execution resumes right here!
     }
 
+    void Scheduler::sleep(Clock::Tick ticks) {
+        if (ticks == 0) {
+            yield();
+            return;
+        }
+
+        Task* self = current_;
+        self->wake_tick = clock_.now() + ticks;
+        self->state = TaskState::Blocked;
+        port::context_switch(self->ctx, sched_ctx_);
+    }
+
+    void Scheduler::tick() {
+        clock_.advance();
+        for (auto& t: tasks_) {
+            if (t->state == TaskState::Blocked && t->wake_tick <= clock_.now()) {
+                t->wake_tick = Task::kNoWake;
+                t->state = TaskState::Ready;
+            }
+        }
+    }
+
+    bool Scheduler::all_finished() const {
+        for (const auto& t: tasks_) {
+            if (t->state != TaskState::Finished) return false;
+        }
+        return true;
+    }
+
 } // namespace niyata

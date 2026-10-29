@@ -6,6 +6,7 @@
 
 #include "niyata/port.hpp"
 #include "niyata/task.hpp"
+#include "niyata/clock.hpp"
 
 namespace niyata {
 
@@ -29,6 +30,19 @@ namespace niyata {
             // Called from inside a task: give the CPU back to the dispatcher.
             void yield();
 
+            // Called from inside a task: block for `ticks` ticks. sleep(0) == yield().
+            void sleep(Clock::Tick ticks);
+
+            // Called from outside tasks (tests / tick source): advance time by one
+            // tick and make every sleeper whose time has come Ready.
+            void tick();
+
+            Clock::Tick now() const {
+                return clock_.now();
+            }
+
+            bool all_finished() const;
+
             Task* current() const {
                 return current_;
             }
@@ -37,6 +51,7 @@ namespace niyata {
             
             Task* pick_next();
 
+            Clock clock_;
             std::vector<std::unique_ptr<Task>> tasks_;
             port::Context* sched_ctx_ = nullptr; // Dispatcher's own context
             Task* current_ = nullptr;
