@@ -22,7 +22,7 @@ namespace niyata {
         std::uint32_t id = 0;
         const char* name = "";
         TaskState state = TaskState::Ready;
-        std::uint8_t priority = 0;
+        std::uint8_t priority = 0; // 0 highest, 31 = lowest
 
         static constexpr std::uint64_t kNoWake = std::numeric_limits<std::uint64_t>::max();
         std::uint64_t wake_tick = kNoWake; // meaningful only while sleeping
@@ -32,6 +32,8 @@ namespace niyata {
 
         std::vector<char> stack;
         port::Context* ctx = nullptr;
+
+        Task* next = nullptr;
     };
 
 } // namespace niyata
