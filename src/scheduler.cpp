@@ -1,5 +1,7 @@
 #include "niyata/scheduler.hpp"
 
+#include <cassert>
+
 namespace niyata {
 
     namespace {
@@ -17,7 +19,7 @@ namespace niyata {
         }
     } // namespace
 
-    Scheduler::Scheduler() : sched_ctx_(port::context_create_main()) {}
+    Scheduler::Scheduler(Clock::Tick time_slice) : sched_ctx_(port::context_create_main()), time_slice_(time_slice) {}
 
     // Clean up all task contexts first, then the dispatcher's own context.
     Scheduler::~Scheduler() {
@@ -25,13 +27,16 @@ namespace niyata {
         port::context_destroy(sched_ctx_);
     }
 
-    Task* Scheduler::create_task(const char* name, TaskFn fn, void* arg, std::size_t stack_size) {
+    Task* Scheduler::create_task(const char* name, TaskFn fn, void* arg, std::uint8_t priority, std::size_t stack_size) {
+        assert(priority < kNumPriorities);
+
         auto t = std::make_unique<Task>();
         t->id = static_cast<std::uint32_t>(tasks_.size());
         t->name = name;
         t->entry = fn;
         t->arg = arg;
         t->stack.resize(stack_size);
+        t->priority = priority;
         // Configure context:
         // - Stack: uses t->stack buffer
         // - Entry point: task_trampoline
@@ -40,21 +45,28 @@ namespace niyata {
 
         Task* raw = t.get();
         tasks_.push_back(std::move(t));
+        make_ready(raw);
         return raw;
     }
 
+    void Scheduler::make_ready(Task* t, bool front) {
+        t->state = TaskState::Ready;
+        if (front) ready_[t->priority].push_front(t);
+        else ready_[t->priority].push_back(t);
+        ready_bitmap_ |= (1u << t->priority);
+    }
+
+    int Scheduler::highest_ready() const {
+        if (ready_bitmap_ == 0) return -1;
+        return __builtin_ctz(ready_bitmap_); // lowest sset bit = highest priority
+    }
+
     Task* Scheduler::pick_next() {
-        // Cooperative Round-Robin:
-        // Scan circularly from cursor_ to give each ready task a fair turn.
-        const std::size_t n = tasks_.size();
-        for (std::size_t i = 0; i < n; i++) {
-            std::size_t idx = (cursor_ + i) % n;
-            if (tasks_[idx]->state == TaskState::Ready) {
-                cursor_ = idx + 1;
-                return tasks_[idx].get();
-            }
-        }
-        return nullptr; // No ready tasks left (all Finished or Blocked)
+        int p = highest_ready();
+        if (p < 0) return nullptr;
+        Task* t = ready_[p].pop_front();
+        if (ready_[p].empty()) ready_bitmap_ &= ~(1u << p);
+        return t;
     }
 
     void Scheduler::run() {
@@ -62,20 +74,18 @@ namespace niyata {
         while (Task* next = pick_next()) {
             current_ = next;
             next->state = TaskState::Running;
+            slice_left_ = time_slice_;
             // Save dispatcher state into sched_ctx_ and jump to the task
             port::context_switch(sched_ctx_, next->ctx);
-            // Control returns here either because:
-            // 1. The task called yield(): state is still Running -> set to Ready so it runs again.
-            // 2. The task finished: state is already Finished -> leave it alone so it's not picked again.
-            if (next->state == TaskState::Running) next->state = TaskState::Ready;
+            // Back in the dispatcher: the task yielded, slept, was preempted,
+            // or finished. It already put itself wherever it belongs.
             current_ = nullptr;
         }
     }
 
     void Scheduler::yield() {
-        // Cooperative yield: voluntarily give up the remainder of our turn.
-        // Freezes the running task here and switches CPU control back to the dispatcher loop.
         Task* self = current_;
+        make_ready(self); // back of its own priority queue
         port::context_switch(self->ctx, sched_ctx_);
         // When this task is scheduled again later, execution resumes right here!
     }
@@ -97,8 +107,38 @@ namespace niyata {
         for (auto& t: tasks_) {
             if (t->state == TaskState::Blocked && t->wake_tick <= clock_.now()) {
                 t->wake_tick = Task::kNoWake;
-                t->state = TaskState::Ready;
+                make_ready(t.get());
             }
+        }
+        if (current_ && slice_left_ > 0) --slice_left_;
+    }
+
+    // Called after every tick while a task is running (the "return from timer
+    // interrupt" point). Decides whether the running task must give up the CPU.
+    void Scheduler::preempt_if_needed() {
+        Task* self = current_;
+        if (!self) return ;
+
+        int top = highest_ready();
+        if (top >= 0 && top < static_cast<int>(self->priority)) {
+            // Strictly higher priority is ready: preempt.
+            // We did not use up our turn, so go to the FRONT of our queue.
+            make_ready(self, true);
+            port::context_switch(self->ctx, sched_ctx_);
+        } else if (slice_left_ == 0) {
+            if (top == static_cast<int>(self->priority)) {
+                make_ready(self);
+                port::context_switch(self->ctx, sched_ctx_);
+            } else {
+                slice_left_ = time_slice_; // only job is top priority, no other higher or equal priority job
+            }
+        }
+    }
+
+    void Scheduler::work(Clock::Tick ticks) {
+        for (Clock::Tick i = 0; i < ticks; i++) {
+            tick();
+            preempt_if_needed();
         }
     }
 
