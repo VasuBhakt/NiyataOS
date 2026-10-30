@@ -78,19 +78,25 @@ Done when: all tests pass locally and in CI, `hello_tasks` is updated or replace
 
 **Goal:** a higher-priority ready task always runs instead of a lower-priority one, driven by the simulated tick.
 
+**Priority Convention:**
+- Priorities range from `0` to `31` (`kNumPriorities = 32`).
+- **Lower number = higher priority** (`0` is the highest real-time priority, `31` is the lowest/idle priority). This directly mirrors the ARM Cortex-M hardware interrupt priority model.
+- Task selection is strict $O(1)$: `ready_bitmap_` tracks non-empty priority queues, and `__builtin_ctz` finds the lowest set bit in a single CPU instruction.
+
 Tasks:
-- Priorities (lower or higher number = higher priority: pick one and document it in `docs/design.md`).
-- Per-priority ready lists plus a priority bitmap so task selection is O(1) (use a count-leading/trailing-zeros builtin).
-- Tick handler: advances the clock, wakes sleepers, and triggers a reschedule if a higher-priority task became ready.
-- Round-robin among equal-priority tasks with a configurable time slice.
-- Preemption on host is simulated: the tick handler is called explicitly by the test harness or a driver loop, never by a real signal.
+- [x] Priorities (lower number = higher priority, documented above).
+- [x] Per-priority ready lists (`TaskQueue ready_[32]`) plus a 32-bit priority bitmap (`ready_bitmap_`) for $O(1)$ task selection (`__builtin_ctz`).
+- [x] Tick handler: advances the clock, wakes sleepers, and triggers a reschedule if a higher-priority task became ready.
+- [x] Round-robin among equal-priority tasks with a configurable time slice (`time_slice_` and `slice_left_`).
+- [x] Preemption on host is simulated: the tick handler is called explicitly by the test harness or a driver loop, never by a real signal.
 
 Tests (`tests/test_preemption.cpp`):
-- A high-priority task waking from sleep preempts a running low-priority task on that same tick.
-- Equal-priority tasks round-robin on time slice expiry.
-- Lower-priority tasks make progress only when higher-priority tasks are blocked.
+- [x] A high-priority task waking from sleep preempts a running low-priority task on that same tick.
+- [x] Equal-priority tasks round-robin on time slice expiry.
+- [x] Lower-priority tasks make progress only when higher-priority tasks are blocked.
+- [x] Preempted tasks keep their turn (pushed to front of their priority queue).
 
-Done when: preemption is deterministic and fully covered by tests.
+Done when: preemption is deterministic and fully covered by tests. (Completed)
 
 ### Week 3: Synchronization and priority inheritance
 

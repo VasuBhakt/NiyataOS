@@ -20,7 +20,7 @@ Early development. Track progress in the roadmap below.
 | Task control blocks and context switching | Done |
 | Cooperative round-robin scheduling | Done |
 | Simulated, tick-driven clock and `sleep` | Done |
-| Fixed-priority preemptive scheduling (O(1) task selection) | Planned |
+| Fixed-priority preemptive scheduling (O(1) task selection) | Done |
 | Mutex and counting semaphore | Planned |
 | Priority inheritance | Planned |
 | Fixed-block pool allocator | Planned |
@@ -88,7 +88,7 @@ A0 B0 A1 B1 A2 B2 done
 ## Roadmap
 
 - [x] Cooperative core: task control block, context switch, round-robin, simulated clock, sleep
-- [ ] Preemption and fixed-priority scheduling
+- [x] Preemption and fixed-priority scheduling
 - [ ] Mutex, semaphore, priority inversion demo and priority inheritance fix
 - [ ] Pool allocator, benchmarks, design write-up
 - [ ] STM32 port (SysTick, PendSV, MSP/PSP)
