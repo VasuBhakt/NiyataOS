@@ -37,6 +37,7 @@ namespace niyata {
         t->arg = arg;
         t->stack.resize(stack_size);
         t->priority = priority;
+        t->base_priority = priority;
         // Configure context:
         // - Stack: uses t->stack buffer
         // - Entry point: task_trampoline
@@ -100,6 +101,29 @@ namespace niyata {
         self->wake_tick = clock_.now() + ticks;
         self->state = TaskState::Blocked;
         port::context_switch(self->ctx, sched_ctx_);
+    }
+
+    void Scheduler::block_current() {
+        Task* self = current_;
+        self->state = TaskState::Blocked;
+        port::context_switch(self->ctx, sched_ctx_);
+    }
+
+    void Scheduler::wake(Task* t) {
+        make_ready(t);
+    }
+
+    void Scheduler::set_priority(Task* t, std::uint8_t p) {
+        if (t->state == TaskState::Ready) {
+            // It sits in the queue for its OLD priority; pull it out first.
+            if(ready_[t->priority].remove(t) && ready_[t->priority].empty()) {
+                ready_bitmap_ &= ~(1u << t->priority);
+            }
+            t->priority = p;
+            make_ready(t);
+        } else {
+            t->priority = p; // Running or Blocked: not in any ready queue, hence no removal needed
+        }
     }
 
     void Scheduler::tick() {

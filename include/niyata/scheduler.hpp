@@ -12,6 +12,9 @@
 
 namespace niyata {
 
+    class Mutex;
+    class Semaphore;
+
     class Scheduler {
 
         public:
@@ -55,6 +58,13 @@ namespace niyata {
             }
         
         private:
+            friend class Mutex;
+            friend class Semaphore;
+
+            void block_current(); // Blocked, no wake time
+            void wake(Task* t); // Blocked -> Ready
+            void set_priority(Task* t, std::uint8_t p);  // change effective priority
+            
             void make_ready(Task* t, bool front = false);
             Task* pick_next();
             int highest_ready() const; // -1 if nothing is ready
