@@ -33,6 +33,21 @@ namespace niyata {
                 return t;
             }
 
+            // Unlink t if present. O(n), only used on rare priority changes.
+            bool remove(Task* t) {
+                Task* prev = nullptr;
+                for (Task* c = head_; c; prev = c, c = c->next) {
+                    if (c==t) {
+                        if (prev) prev->next = c->next;
+                        else head_ = c->next;
+                        if (tail_ == c) tail_ = prev;
+                        c->next = nullptr;
+                        return true;
+                    }
+                }
+                return false;
+            }
+
         private:
             Task* head_ = nullptr;
             Task* tail_ = nullptr;

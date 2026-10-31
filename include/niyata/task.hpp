@@ -9,6 +9,8 @@
 
 namespace niyata {
 
+    class Mutex;
+
     enum class TaskState {
         Ready,
         Running,
@@ -22,7 +24,8 @@ namespace niyata {
         std::uint32_t id = 0;
         const char* name = "";
         TaskState state = TaskState::Ready;
-        std::uint8_t priority = 0; // 0 highest, 31 = lowest
+        std::uint8_t priority = 0; // EFFECTIVE PRIORITY (0 highest, 31 = lowest)
+        std::uint8_t base_priority = 0; // original priority
 
         static constexpr std::uint64_t kNoWake = std::numeric_limits<std::uint64_t>::max();
         std::uint64_t wake_tick = kNoWake; // meaningful only while sleeping
@@ -32,6 +35,9 @@ namespace niyata {
 
         std::vector<char> stack;
         port::Context* ctx = nullptr;
+
+        Mutex* waiting_on = nullptr; // mutex this task is blocked on, if any
+        Mutex* held_head = nullptr; // mutexes this task currently owns
 
         Task* next = nullptr;
     };
