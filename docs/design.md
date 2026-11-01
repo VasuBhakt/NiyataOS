@@ -103,19 +103,19 @@ Done when: preemption is deterministic and fully covered by tests. (Completed)
 **Goal:** mutex and semaphore, with a reproduced priority inversion and its fix.
 
 Tasks:
-- Counting semaphore (`take`/`give`, with blocking, and a timeout in ticks).
-- Mutex with an owner, blocking, and wake-up of the highest-priority waiter.
-- First implement the mutex **without** priority inheritance and write a test that reproduces classic priority inversion (low holds the lock, high blocks on it, medium starves low).
-- Add priority inheritance: the owner temporarily inherits the highest waiting priority and restores its base priority on release. Handle nested locks correctly.
-- `examples/priority_inversion_demo.cpp`: prints the sequence with and without inheritance.
+- [x] Counting semaphore (`take`/`give`, with blocking, and a timeout in ticks).
+- [x] Mutex with an owner, blocking, and wake-up of the highest-priority waiter.
+- [x] First implement the mutex **without** priority inheritance and write a test that reproduces classic priority inversion (low holds the lock, high blocks on it, medium starves low).
+- [x] Add priority inheritance: the owner temporarily inherits the highest waiting priority and restores its base priority on release. Handle nested locks correctly.
+- [x] `examples/priority_inversion_demo.cpp`: prints the sequence with and without inheritance.
 
 Tests (`tests/test_priority_inversion.cpp`, `tests/test_sync.cpp`):
-- The inversion test fails or shows the inversion with inheritance off, and passes with it on.
-- Mutex wakes the highest-priority waiter first.
-- Base priority is restored after release, including with nested locks.
-- Semaphore blocking, timeout, and ordering.
+- [x] The inversion test fails or shows the inversion with inheritance off, and passes with it on.
+- [x] Mutex wakes the highest-priority waiter first.
+- [x] Base priority is restored after release, including with nested locks.
+- [x] Semaphore blocking, timeout, and ordering.
 
-Done when: the inversion test demonstrates both behaviours. This is the headline demo of the project.
+Done when: the inversion test demonstrates both behaviours. This is the headline demo of the project. (Completed)
 
 ### Week 4: Allocator, benchmarks, write-up (host complete)
 

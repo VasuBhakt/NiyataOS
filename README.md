@@ -1,4 +1,4 @@
-# Niyata
+# ⏱️ Niyata
 
 **A deterministic, preemptive real-time operating system kernel in C++, built host-first and ported to ARM Cortex-M.**
 
@@ -8,11 +8,11 @@ Niyata is a small RTOS kernel written to understand, and demonstrate, how real-t
 
 The design goal is **determinism**: bounded, predictable worst-case latency, rather than best average throughput.
 
-## Status
+## 📌 Status
 
-Early development. Track progress in the roadmap below.
+Active development. Track progress in the roadmap below.
 
-## Features
+## ✨ Features
 
 | Feature | Status |
 | --- | --- |
@@ -21,20 +21,20 @@ Early development. Track progress in the roadmap below.
 | Cooperative round-robin scheduling | Done |
 | Simulated, tick-driven clock and `sleep` | Done |
 | Fixed-priority preemptive scheduling (O(1) task selection) | Done |
-| Mutex and counting semaphore | Planned |
-| Priority inheritance | Planned |
+| Mutex and counting semaphore | Done |
+| Priority inheritance | Done |
 | Fixed-block pool allocator | Planned |
 | Latency and jitter benchmarks (p50 / p99 / max) | Planned |
 | Cortex-M port (SysTick, PendSV) | Planned |
 
-## Design principles
+## 📐 Design Principles
 
 - **Deterministic first.** Worst-case behaviour is measured and reported, not just averages.
 - **Portable core.** The scheduler never touches platform headers. Everything platform-specific lives behind a small port interface, so the same core runs on a Linux simulation and on Cortex-M.
 - **Testable.** On the host, time is simulated and tick-driven, so scheduling behaviour is reproducible and covered by unit tests.
 - **Small and readable.** The kernel is meant to be read end to end.
 
-## Architecture
+## 🏛️ Architecture
 
 ```
           +-----------------------------+
@@ -53,7 +53,7 @@ Early development. Track progress in the roadmap below.
           +-----------------------------+
 ```
 
-## Repository layout
+## 📁 Repository Layout
 
 ```
 include/niyata/   public headers
@@ -66,7 +66,7 @@ examples/         small demos
 docs/             design notes and build plan
 ```
 
-## Building
+## 🛠️ Building & Running
 
 The host build requires Linux or WSL2 (the simulation uses `ucontext`, which needs glibc).
 
@@ -76,32 +76,55 @@ sudo apt install -y build-essential cmake git gdb clang
 cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
 cmake --build build -j
 ctest --test-dir build --output-on-failure
-./build/hello_tasks
+./build/hello_tasks 
+./build/priority_inversion_demo
 ```
 
-Expected output of the demo:
+Expected output of the demos:
 
 ```
+hello_tasks output:
+
 A0 B0 A1 B1 A2 B2 done
+
+-------------------------------------------------------
+
+priority_inversion_demo output:
+
+== priority inheritance ON ==
+ t=0 L TOOK the lock
+ t=1 H WANTS the lock
+ t=4 L RELEASING the lock
+ t=4 H GOT the lock
+ t=4 M starts burning CPU
+ t=7 M done
+
+== priority inheritance OFF ==
+ t=0 L TOOK the lock
+ t=1 H WANTS the lock
+ t=2 M starts burning CPU
+ t=5 M done
+ t=7 L RELEASING the lock
+ t=7 H GOT the lock
 ```
 
-## Roadmap
+## 🗺️ Roadmap
 
 - [x] Cooperative core: task control block, context switch, round-robin, simulated clock, sleep
 - [x] Preemption and fixed-priority scheduling
-- [ ] Mutex, semaphore, priority inversion demo and priority inheritance fix
+- [x] Mutex, semaphore, priority inversion demo and priority inheritance fix
 - [ ] Pool allocator, benchmarks, design write-up
 - [ ] STM32 port (SysTick, PendSV, MSP/PSP)
 - [ ] On-hardware latency measurements and demo
 
-## Benchmarks
+## 📊 Benchmarks
 
 Results will be published in [`docs/benchmarks.md`](docs/benchmarks.md) once the host benchmarks are in.
 
-## Maintainer
+## 👤 Maintainer
 
 [Swastik Bose](https://github.com/VasuBhakt), a.k.a VasuBhakt
 
-## License
+## 📄 License
 
 [MIT](LICENSE)
