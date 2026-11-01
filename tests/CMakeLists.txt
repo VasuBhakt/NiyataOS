@@ -8,6 +8,6 @@ FetchContent_MakeAvailable(googletest)
 
 include(GoogleTest)
 
-add_executable(niyata_tests test_context.cpp test_cooperative.cpp test_clock_sleep.cpp test_preemption.cpp)
+add_executable(niyata_tests test_context.cpp test_cooperative.cpp test_clock_sleep.cpp test_preemption.cpp test_sync.cpp test_priority_inversion.cpp)
 target_link_libraries(niyata_tests PRIVATE niyata GTest::gtest_main)
 gtest_discover_tests(niyata_tests)
