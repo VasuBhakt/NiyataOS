@@ -22,6 +22,8 @@ target_compile_options(niyata PRIVATE -Wall -Wextra -Wpedantic)
 if(NIYATA_BUILD_EXAMPLES)
     add_executable(hello_tasks examples/hello_tasks.cpp)
     target_link_libraries(hello_tasks PRIVATE niyata)
+    add_executable(priority_inversion_demo examples/priority_inversion_demo.cpp)
+    target_link_libraries(priority_inversion_demo PRIVATE niyata)
 endif()
 
 if(NIYATA_BUILD_TESTS)
