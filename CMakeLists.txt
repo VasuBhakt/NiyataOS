@@ -8,6 +8,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 option(NIYATA_BUILD_TESTS "Build unit tests" ON)
 option(NIYATA_BUILD_EXAMPLES "Build examples" ON)
+option(NIYATA_BUILD_BENCH "Build benchmarks" ON)
 
 # Core library. Add src/*.cpp here as the scheduler grows.
 add_library(niyata
@@ -30,4 +31,8 @@ endif()
 if(NIYATA_BUILD_TESTS)
     enable_testing()
     add_subdirectory(tests)
+endif()
+
+if(NIYATA_BUILD_BENCH)
+    add_subdirectory(bench)
 endif()

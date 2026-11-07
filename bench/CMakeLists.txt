@@ -1,0 +1,2 @@
+add_executable(bench_context_switch bench_context_switch.cpp)
+target_link_libraries(bench_context_switch PRIVATE niyata)
