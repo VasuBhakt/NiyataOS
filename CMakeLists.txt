@@ -14,6 +14,7 @@ add_library(niyata
     src/scheduler.cpp
     src/mutex.cpp
     src/semaphore.cpp
+    src/pool.cpp
     port/host/context_ucontext.cpp
 )
 target_include_directories(niyata PUBLIC include)
