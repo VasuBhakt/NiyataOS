@@ -24,7 +24,7 @@ Active development. Track progress in the roadmap below.
 | Mutex and counting semaphore | Done |
 | Priority inheritance | Done |
 | Fixed-block pool allocator | Done |
-| Latency and jitter benchmarks (p50 / p99 / max) | Planned |
+| Latency and jitter benchmarks (p50 / p99 / max) | Done |
 | Cortex-M port (SysTick, PendSV) | Planned |
 
 ## 📐 Design Principles
@@ -113,13 +113,20 @@ priority_inversion_demo output:
 - [x] Cooperative core: task control block, context switch, round-robin, simulated clock, sleep
 - [x] Preemption and fixed-priority scheduling
 - [x] Mutex, semaphore, priority inversion demo and priority inheritance fix
-- [ ] Pool allocator, benchmarks, design write-up
+- [x] Pool allocator, benchmarks, design write-up
 - [ ] STM32 port (SysTick, PendSV, MSP/PSP)
 - [ ] On-hardware latency measurements and demo
 
 ## 📊 Benchmarks
 
-Results will be published in [`docs/benchmarks.md`](docs/benchmarks.md) once the host benchmarks are in.
+Measured on Linux (x86_64, pinned to Core 0) across 8,000,000 samples (40 runs × 200,000 iterations):
+
+| Benchmark | Min | p50 (Median) | p99 | p99.9 | Worst Max |
+| :--- | :---: | :---: | :---: | :---: | :---: |
+| **Raw Context Switch (1-way)** | 145 ns | 162 ns | 261 ns | 928 ns | 1.15 ms |
+| **`yield()` Round Trip** | 283 ns | 315 ns | 444 ns | 1.47 µs | 684 µs |
+
+Full methodology, baseline comparisons, and analysis are published in [`docs/benchmarks.md`](docs/benchmarks.md).
 
 ## 👤 Maintainer
 
