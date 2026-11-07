@@ -122,10 +122,10 @@ Done when: the inversion test demonstrates both behaviours. This is the headline
 **Goal:** host version is finished and presentable even if the hardware port never happens.
 
 Tasks:
-- `pool.hpp` / `pool.cpp`: fixed-block pool allocator, O(1) alloc and free, no fragmentation, deterministic.
-- `bench/bench_context_switch.cpp`: measure context-switch latency and scheduling overhead. Report p50, p99, max, and jitter. Use a high-resolution monotonic clock for measuring only (never for scheduling). Warm up, run many iterations, pin to a core where possible.
-- `docs/design.md`: design decisions and tradeoffs (why fixed-priority, why tick-driven, why the port layer, priority inheritance vs ceiling).
-- `docs/benchmarks.md`: results table with methodology. Never invent numbers; only record measured results.
+- [x] `pool.hpp` / `pool.cpp`: fixed-block pool allocator, O(1) alloc and free, no fragmentation, deterministic.
+- [ ] `bench/bench_context_switch.cpp`: measure context-switch latency and scheduling overhead. Report p50, p99, max, and jitter. Use a high-resolution monotonic clock for measuring only (never for scheduling). Warm up, run many iterations, pin to a core where possible.
+- [ ] `docs/design.md`: design decisions and tradeoffs (why fixed-priority, why tick-driven, why the port layer, priority inheritance vs ceiling).
+- [ ] `docs/benchmarks.md`: results table with methodology. Never invent numbers; only record measured results.
 - Optional, only if time remains: EDF as a pluggable policy behind `pick_next()`.
 - Read FreeRTOS `tasks.c` and the Cortex-M `port.c` and xv6 `swtch.S` before week 5.
 

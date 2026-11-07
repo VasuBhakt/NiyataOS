@@ -23,7 +23,7 @@ Active development. Track progress in the roadmap below.
 | Fixed-priority preemptive scheduling (O(1) task selection) | Done |
 | Mutex and counting semaphore | Done |
 | Priority inheritance | Done |
-| Fixed-block pool allocator | Planned |
+| Fixed-block pool allocator | Done |
 | Latency and jitter benchmarks (p50 / p99 / max) | Planned |
 | Cortex-M port (SysTick, PendSV) | Planned |
 
