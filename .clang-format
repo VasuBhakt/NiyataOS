@@ -1,0 +1,13 @@
+BasedOnStyle: LLVM
+Language: Cpp
+Standard: c++20
+IndentWidth: 4
+TabWidth: 4
+UseTab: Never
+ColumnLimit: 120
+AccessModifierOffset: -2
+AllowShortFunctionsOnASingleLine: Inline
+BreakBeforeBraces: Attach
+NamespaceIndentation: None
+FixNamespaceComments: true
+SortIncludes: CaseSensitive
