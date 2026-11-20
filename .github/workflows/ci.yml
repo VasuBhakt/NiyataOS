@@ -32,3 +32,27 @@ jobs:
         run: |
           ./build/hello_tasks
           ./build/priority_inversion_demo
+
+  valgrind:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Valgrind
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y valgrind
+
+      - name: Configure CMake (Debug)
+        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug
+
+      - name: Build Test Target
+        run: cmake --build build --target niyata_tests -j
+
+      - name: Run Tests under Valgrind
+        run: |
+          valgrind --leak-check=full \
+                   --show-leak-kinds=all \
+                   --track-origins=yes \
+                   --error-exitcode=1 \
+                   ./build/tests/niyata_tests
