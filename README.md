@@ -25,6 +25,7 @@ Active development. Track progress in the roadmap below.
 | Priority inheritance | Done |
 | Fixed-block pool allocator | Done |
 | Latency and jitter benchmarks (p50 / p99 / max) | Done |
+| Automated CI (GCC/Clang matrix, Valgrind leak checks, smoke tests) | Done |
 | Cortex-M port (SysTick, PendSV) | Planned |
 
 ## 📐 Design Principles
@@ -107,6 +108,14 @@ priority_inversion_demo output:
  t=7 L RELEASING the lock
  t=7 H GOT the lock
 ```
+
+## 🚦 Continuous Integration
+
+Automated testing runs on every push and pull request via GitHub Actions:
+- **Compiler & Configuration Matrix:** Compiles with `-Wall -Wextra -Wpedantic` across **GCC (`g++`)** and **Clang (`clang++`)** in both **Debug** and **Release** modes.
+- **Unit Test Suite:** Runs all 31 GoogleTest unit tests via `ctest` on every matrix target.
+- **Executable Smoke Tests:** Runs `hello_tasks`, `priority_inversion_demo`, and `bench_context_switch` to guard against regressions and bit-rot.
+- **Valgrind Memory Verification:** Full heap analysis (`--leak-check=full`) ensuring zero leaks on exit, configured with `--undef-value-errors=no` to suppress host `swapcontext` stack-switch register warnings.
 
 ## 🗺️ Roadmap
 

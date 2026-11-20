@@ -16,8 +16,8 @@ Niyata is a deterministic, preemptive RTOS kernel in C++20. It is built host-fir
 6. **Report worst case.** Benchmarks must report p50, p99 and max, not only averages.
 7. **Every feature ships with tests.** No feature is "done" without a passing test in `tests/`.
 8. **Do not add placeholder files.** Create a file only when the current week needs it.
-9. **Do not enable AddressSanitizer** on host builds; it produces false positives with `swapcontext`.
-10. **Keep the build green.** CI builds with g++ and clang++ and runs `ctest`.
+9. **Do not enable AddressSanitizer** on host builds; it produces false positives with `swapcontext`. Use Valgrind with `--undef-value-errors=no` instead for memory leak and heap safety validation.
+10. **Keep the build green.** CI builds with g++ and clang++ across Debug and Release, runs unit tests (`ctest`), smoke-tests demos and benchmarks, and checks for memory leaks with Valgrind.
 
 ## 2. Current state
 
