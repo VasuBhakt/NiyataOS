@@ -9,13 +9,26 @@ jobs:
   build-test:
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         compiler: [g++, clang++]
+        build_type: [Debug, Release]
     steps:
       - uses: actions/checkout@v4
-      - name: Configure
-        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=${{ matrix.compiler }}
-      - name: Build
+
+      - name: Configure CMake
+        run: |
+          cmake -S . -B build \
+            -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
+            -DCMAKE_CXX_COMPILER=${{ matrix.compiler }}
+
+      - name: Build All Targets
         run: cmake --build build -j
-      - name: Test
+
+      - name: Run Test Suite
         run: ctest --test-dir build --output-on-failure
+
+      - name: Run Demo Executables (Smoke Test)
+        run: |
+          ./build/hello_tasks
+          ./build/priority_inversion_demo
