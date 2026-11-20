@@ -28,10 +28,11 @@ jobs:
       - name: Run Test Suite
         run: ctest --test-dir build --output-on-failure
 
-      - name: Run Demo Executables (Smoke Test)
+      - name: Run Demo and Benchmark Executables (Smoke Test)
         run: |
           ./build/hello_tasks
           ./build/priority_inversion_demo
+          ./build/bench/bench_context_switch
 
   valgrind:
     runs-on: ubuntu-latest
